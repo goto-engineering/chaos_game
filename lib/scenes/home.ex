@@ -33,7 +33,6 @@ defmodule ChaosGame.Scene.Home do
             |> Enum.shuffle 
             |> Enum.at(0)
 
-      IO.inspect rnd
       new_point = Enum.at(rules, rnd - 1).(Enum.at(acc,0))
 
       {[new_point | acc], rnd}
