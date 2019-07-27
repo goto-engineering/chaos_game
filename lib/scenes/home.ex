@@ -8,37 +8,44 @@ defmodule ChaosGame.Scene.Home do
   import Scenic.Primitives
   # import Scenic.Components
 
-  @note """
-    This is a very simple starter application.
-
-    If you want a more full-on example, please start from:
-
-    mix scenic.new.example
-  """
-
   @text_size 24
 
-  # ============================================================================
-  # setup
+  def point({x, y}) do
+    rectangle_spec({1, 1}, stroke: {1, :white}, translate: {x, y})
+  end
 
-  # --------------------------------------------------------
   def init(_, opts) do
-    # get the width and height of the viewport. This is to demonstrate creating
-    # a transparent full-screen rectangle to catch user input
     {:ok, %ViewPort.Status{size: {width, height}}} = ViewPort.info(opts[:viewport])
 
-    # show the version of scenic and the glfw driver
-    scenic_ver = Application.spec(:scenic, :vsn) |> to_string()
-    glfw_ver = Application.spec(:scenic, :vsn) |> to_string()
+    fraction = 2
+
+    rules = [
+      fn ({x, y}) -> {x - x/fraction, y - y/fraction} end,
+      fn ({x, y}) -> {x + (width - x)/fraction, y - y/fraction} end,
+      fn ({x, y}) -> {x - x/fraction, y + (height - y)/fraction} end,
+      fn ({x, y}) -> {x + (width - x)/fraction, y + (height - y)/fraction} end
+    ]
+
+    start = {:rand.uniform(width), :rand.uniform(height)}
+
+    reduction = 1..5000 |> Enum.reduce({[start], 0}, fn (_, {acc, last_vertex}) ->
+      rnd = Enum.to_list(1..Enum.count(rules)) -- [last_vertex]
+            |> Enum.shuffle 
+            |> Enum.at(0)
+
+      IO.inspect rnd
+      new_point = Enum.at(rules, rnd - 1).(Enum.at(acc,0))
+
+      {[new_point | acc], rnd}
+    end)
+
+    {points, _} = reduction
 
     graph =
       Graph.build(font: :roboto, font_size: @text_size)
-      |> add_specs_to_graph([
-        text_spec("scenic: v" <> scenic_ver, translate: {20, 40}),
-        text_spec("glfw: v" <> glfw_ver, translate: {20, 40 + @text_size}),
-        text_spec(@note, translate: {20, 120}),
-        rect_spec({width, height})
-      ])
+      |> add_specs_to_graph(
+        points |> Enum.map(&point/1)
+      )
 
     {:ok, graph, push: graph}
   end
