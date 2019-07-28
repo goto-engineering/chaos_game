@@ -6,7 +6,14 @@
 
 ![latticework fractal](https://github.com/goto-engineering/chaos_game/raw/master/chaos_game.png "Latticework Fractal")
 
-Simple implementation of a chaos game with a rectangular polygon and a fraction of 1/2. The only rule is that the next random vertex cannot be the same as the last vertex, resulting in a nice latticework fractal. Uses Scenic framework for rendering.
+Simple implementation of a chaos game with a rectangular polygon and a fraction of 1/2. The only rule is that the next random vertex cannot be the same as the last vertex, resulting in a nice latticework fractal.
+
+Uses Elixir:
+```
+brew install elixir
+```
+
+Uses Scenic framework for rendering, and therefore requires [installing Scenic's dependencies](https://github.com/boydm/scenic_new).
 
 Install dependencies:
 ```
